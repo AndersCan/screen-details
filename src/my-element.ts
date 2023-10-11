@@ -2,6 +2,8 @@ import { html, render } from "lit-html";
 import { effect, signal } from "usignal";
 import { ScreenDetails, ScreenDetailed } from "./types";
 import { getContainerSize } from "./utils/get-container-size";
+import { sleep } from "./utils/sleep";
+import { getDisplaySize } from "./utils/get-display-size";
 /**
  * An example element.
  */
@@ -30,7 +32,11 @@ export class MyElement extends HTMLElement {
     // });
     this.dispose = effect(() => {
       console.log("re-render", this.state);
-      this.render();
+      try {
+        this.render();
+      } catch (err) {
+        console.error(err);
+      }
     });
   }
   disconnectedCallback() {
@@ -38,42 +44,64 @@ export class MyElement extends HTMLElement {
   }
 
   template() {
-    return html`<div>
-      <h1>Count: ${this.state.count.value}</h1>
-      <button
-        class="border p-1 hover:bg-slate-400 rounded-sm hover:text-white"
-        @click=${() => this.getPermission()}
-      >
-        Get permission
-      </button>
-      <pre>${this.state.text.value}</pre>
+    try {
+      const screens = getDisplaySize(this.state.screens);
+      const screenshtml = screens.map((screen) => {
+        const bg =
+          screen.label === this.state.currentScreen.label
+            ? {
+                default: "bg-orange-700",
+                hover: "hover:bg-orange-600",
+              }
+            : {
+                default: "bg-slate-700",
+                hover: "hover:bg-slate-600",
+              };
 
-      <div
-        class="relative bg-slate-300 mx-auto"
-        style="width: ${this.state.containerSize.value.width}px; height: ${this
-          .state.containerSize.value.height}px;"
-      >
-        ${this.state.screens.map((screen) => {
-          const bg =
-            screen === this.state.currentScreen
-              ? "bg-orange-800"
-              : "bg-slate-700";
+        const scaleDown = 10;
+        const left = screen.left / scaleDown;
+        const top = screen.top / scaleDown;
 
-          const scaleDown = 10;
-          const left = screen.left / scaleDown;
-          const top = screen.top / scaleDown;
+        const width = screen.width / scaleDown;
+        const height = screen.height / scaleDown;
+        const style = `left: ${left}px; top: ${top}px; width: ${width}px; height:${height}px;`;
+        return html`
+          <button
+            class="absolute text-white ${bg.default} ${bg.hover} rounded-md"
+            style="${style}"
+            data-label="${screen.label}"
+            @click="${() => {
+              const screenselected = new CustomEvent("screenselected", {
+                detail: { screen },
+              });
+              this.dispatchEvent(screenselected);
+            }}"
+          >
+            <p class="w-full text-center">${screen.label}</p>
+          </button>
+        `;
+      });
+      return html`<div>
+        <h1>Count: ${this.state.count.value}</h1>
+        <button
+          class="border p-1 hover:bg-slate-400 rounded-sm hover:text-white"
+          @click=${() => this.getPermission()}
+        >
+          Get permission
+        </button>
+        <pre>${this.state.text.value}</pre>
 
-          const width = screen.width / scaleDown;
-          const height = screen.height / scaleDown;
-          const style = `left: ${left}px; top: ${top}px; width: ${width}px; height:${height}px;`;
-          return html`
-            <div class="absolute text-white ${bg}" style="${style}">
-              <p class="w-full text-center">${screen.label}</p>
-            </div>
-          `;
-        })}
-      </div>
-    </div>`;
+        <div
+          class="relative bg-slate-300 mx-auto"
+          style="width: ${this.state.containerSize.value
+            .width}px; height: ${this.state.containerSize.value.height}px;"
+        >
+          ${screenshtml}
+        </div>
+      </div>`;
+    } catch (err) {
+      console.error(err);
+    }
   }
   async getPermission() {
     try {
@@ -84,16 +112,17 @@ export class MyElement extends HTMLElement {
       console.log({ permission });
       //@ts-expect-error
       const details: ScreenDetails = await window.getScreenDetails();
-      console.log(details);
-      this.state.screens = details.screens;
-      this.state.currentScreen = details.currentScreen;
-      this.state.text.value = `
-      ${details.screens.map((screen) => screenToText(screen))}
-    `;
 
-      this.state.containerSize.value = getContainerSize(details.screens, {
-        scaleDown: 10,
+      details.addEventListener("screenschange", async (event) => {
+        // Screen has changed, but might take some time before
+        // window.getScreenDetails gives updated information
+        await sleep(2000);
+        console.log("screenschange", event);
+        //@ts-expect-error
+        const details: ScreenDetails = await window.getScreenDetails();
+        this.updateScreens(details);
       });
+      this.updateScreens(details);
     } catch (err) {
       console.log(err);
     }
@@ -101,6 +130,19 @@ export class MyElement extends HTMLElement {
 
   render() {
     render(this.template(), this);
+  }
+
+  updateScreens(details: ScreenDetails) {
+    console.log(details);
+    this.state.screens = details.screens;
+    this.state.currentScreen = details.currentScreen;
+    this.state.text.value = `
+    ${details.screens.map((screen) => screenToText(screen))}
+  `;
+
+    this.state.containerSize.value = getContainerSize(details.screens, {
+      scaleDown: 10,
+    });
   }
 }
 

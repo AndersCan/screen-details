@@ -91,4 +91,27 @@ describe("getContainerSize", (test) => {
 
     expect(actual).toStrictEqual(expected);
   });
+
+  test("two screens left, right [main]", () => {
+    const leftScreen = {
+      left: -800,
+      top: 0,
+      width: 1600,
+      height: 600,
+    };
+    const rightScreen = {
+      left: 0,
+      top: 0,
+      width: 800,
+      height: 600,
+    };
+    const expected = {
+      width: 1600 + 800,
+      height: 600,
+    };
+
+    const actual = getContainerSize([leftScreen, rightScreen]);
+
+    expect(actual).toStrictEqual(expected);
+  });
 });

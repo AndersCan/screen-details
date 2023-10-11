@@ -2,6 +2,10 @@ export interface ScreenDetails {
   /** The screen the browser is on */
   currentScreen: ScreenDetailed;
   screens: ScreenDetailed[];
+  addEventListener: (
+    key: "screenschange",
+    fn: (event: unknown) => void,
+  ) => void;
 }
 
 export interface ScreenDetailed {
