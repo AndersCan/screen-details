@@ -1,6 +1,6 @@
 {
   "name": "screen-details",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "main": "./package/index.package.cjs",
   "module": "./package/index.package.js",
