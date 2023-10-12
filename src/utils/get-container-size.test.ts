@@ -1,8 +1,8 @@
 // sum.test.js
-import { describe, expect } from "vitest";
+import { describe, test, expect } from "vitest";
 import { getContainerSize } from "./get-container-size";
 
-describe("getContainerSize", (test) => {
+describe("getContainerSize", () => {
   test("simple test", () => {
     const expected = {
       width: 222,
@@ -96,7 +96,7 @@ describe("getContainerSize", (test) => {
     const leftScreen = {
       left: -800,
       top: 0,
-      width: 1600,
+      width: 800,
       height: 600,
     };
     const rightScreen = {
@@ -106,8 +106,56 @@ describe("getContainerSize", (test) => {
       height: 600,
     };
     const expected = {
-      width: 1600 + 800,
+      width: 800 + 800,
       height: 600,
+    };
+
+    const actual = getContainerSize([leftScreen, rightScreen]);
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  test("two screens left [built-in], right [lg]", () => {
+    const leftScreen = {
+      left: -1680,
+      top: 354,
+      width: 1680,
+      height: 1050,
+    };
+    const rightScreen = {
+      left: 0,
+      top: 0,
+      width: 2560,
+      height: 1440,
+    };
+    const expected = {
+      width: 1680 + 2560,
+      height: 1440,
+    };
+
+    const actual = getContainerSize([leftScreen, rightScreen]);
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  test("two screens left [built-in], right [lg]", () => {
+    // screen at 90 degrees
+    const leftScreen = {
+      left: -1440,
+      top: -849,
+      width: 1440,
+      height: 2560,
+    };
+
+    const rightScreen = {
+      left: 0,
+      top: 0,
+      width: 2056,
+      height: 1329,
+    };
+    const expected = {
+      width: 1440 + 2056,
+      height: 2560,
     };
 
     const actual = getContainerSize([leftScreen, rightScreen]);

@@ -3,14 +3,17 @@ import { effect, signal } from "usignal";
 import { ScreenDetails, ScreenDetailed } from "./types";
 import { getContainerSize } from "./utils/get-container-size";
 import { sleep } from "./utils/sleep";
-import { getDisplaySize } from "./utils/get-display-size";
+import { getScreenSizes } from "./utils/get-screen-sizes";
+import { getPermissionState } from "./utils/get-permission-state";
+import { getScreenDetails } from "./utils/get-screen-details";
 /**
  * An example element.
  */
 export class MyElement extends HTMLElement {
   constructor(
     public state = {
-      count: signal(0),
+      rerender: signal(0),
+      supported: signal(false),
       text: signal(""),
       currentScreen: {} as ScreenDetailed,
       screens: [] as ScreenDetailed[],
@@ -26,16 +29,23 @@ export class MyElement extends HTMLElement {
   connectedCallback() {
     this.innerHTML = "";
     // //@ts-expect-error
-    // const screenDetails = window.getScreenDetails().then((e) => {
-    //   console.log(e);
-    //   this.state.text.value = JSON.stringify(e, null, 2);
-    // });
+
     this.dispose = effect(() => {
-      console.log("re-render", this.state);
       try {
         this.render();
       } catch (err) {
         console.error(err);
+      }
+    });
+
+    getPermissionState().then((permission) => {
+      const isSupported = permission !== "unsupported";
+      this.state.supported.value = isSupported;
+
+      if (isSupported) {
+        getScreenDetails().then((details) => {
+          this.updateScreens(details);
+        });
       }
     });
   }
@@ -45,7 +55,7 @@ export class MyElement extends HTMLElement {
 
   template() {
     try {
-      const screens = getDisplaySize(this.state.screens);
+      const screens = getScreenSizes(this.state.screens);
       const screenshtml = screens.map((screen) => {
         const bg =
           screen.label === this.state.currentScreen.label
@@ -67,7 +77,7 @@ export class MyElement extends HTMLElement {
         const style = `left: ${left}px; top: ${top}px; width: ${width}px; height:${height}px;`;
         return html`
           <button
-            class="absolute text-white ${bg.default} ${bg.hover} rounded-md"
+            class="absolute text-white ${bg.default} ${bg.hover} rounded-sm"
             style="${style}"
             data-label="${screen.label}"
             @click="${() => {
@@ -82,7 +92,7 @@ export class MyElement extends HTMLElement {
         `;
       });
       return html`<div>
-        <h1>Count: ${this.state.count.value}</h1>
+        <h1>Support: ${this.state.supported.value ? "✅" : "❌"}</h1>
         <button
           class="border p-1 hover:bg-slate-400 rounded-sm hover:text-white"
           @click=${() => this.getPermission()}
@@ -104,28 +114,20 @@ export class MyElement extends HTMLElement {
     }
   }
   async getPermission() {
-    try {
-      const permission =
-        //@ts-expect-error
-        (await navigator.permissions.query({ name: "window-management" }))
-          .state;
-      console.log({ permission });
-      //@ts-expect-error
-      const details: ScreenDetails = await window.getScreenDetails();
-
-      details.addEventListener("screenschange", async (event) => {
-        // Screen has changed, but might take some time before
-        // window.getScreenDetails gives updated information
-        await sleep(2000);
-        console.log("screenschange", event);
-        //@ts-expect-error
-        const details: ScreenDetails = await window.getScreenDetails();
-        this.updateScreens(details);
-      });
-      this.updateScreens(details);
-    } catch (err) {
-      console.log(err);
+    const permission = await getPermissionState();
+    if (permission === "denied" || permission === "unsupported") {
+      return;
     }
+    const details = await getScreenDetails();
+
+    details.addEventListener("screenschange", async (_event) => {
+      // Screen has changed, but might take some time before
+      // window.getScreenDetails gives updated information
+      await sleep(1000);
+      const details = await getScreenDetails();
+      this.updateScreens(details);
+    });
+    this.updateScreens(details);
   }
 
   render() {
@@ -133,7 +135,6 @@ export class MyElement extends HTMLElement {
   }
 
   updateScreens(details: ScreenDetails) {
-    console.log(details);
     this.state.screens = details.screens;
     this.state.currentScreen = details.currentScreen;
     this.state.text.value = `
@@ -148,11 +149,11 @@ export class MyElement extends HTMLElement {
 
 customElements.define("my-element", MyElement);
 
-declare global {
-  interface HTMLElementTagNameMap {
-    "my-element": MyElement;
-  }
-}
+// declare global {
+//   interface HTMLElementTagNameMap {
+//     "my-element": MyElement;
+//   }
+// }
 
 function screenToText(currentScreen: ScreenDetailed) {
   return `

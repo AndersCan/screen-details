@@ -7,10 +7,14 @@ type NeededScreenProps = Pick<
 type Options = {
   scaleDown: number;
 };
+
 /**
+ * Get screen size and positions for displaying a "minimap" of screens.
+ * Should have `position: absolute` and styled with the provided values.
+ *
  * Transposes all items such that no items have a negative position left or top value
  */
-export function getDisplaySize(
+export function getScreenSizes(
   readonlyScreens: readonly NeededScreenProps[],
   options: Options = { scaleDown: 1 },
 ) {
@@ -26,13 +30,12 @@ export function getDisplaySize(
   const { scaleDown } = options;
 
   return screens.map((screen) => {
-    console.log(screen);
     const left = (screen.left + lowestLeft) / scaleDown;
     const top = (screen.top + lowestTop) / scaleDown;
 
     const width = screen.width / scaleDown;
     const height = screen.height / scaleDown;
 
-    return { left, top, width, height, label: screen.label };
+    return { screen, left, top, width, height, label: screen.label };
   });
 }

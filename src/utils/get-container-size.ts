@@ -7,6 +7,10 @@ type NeededScreenProps = Pick<
 type Options = {
   scaleDown: number;
 };
+
+/**
+ * "Minimap" container size. Should have `position: relative`
+ */
 export function getContainerSize(
   readonlyScreens: NeededScreenProps[],
   options: Options = { scaleDown: 1 },
@@ -29,11 +33,10 @@ export function getContainerSize(
   const top = topDescending[0].top;
   // find lowest top
   const lowestAscending = screens.sort(
-    (a, b) => a.top + a.height - b.top + b.height,
+    (a, b) => a.top + a.height - (b.top + b.height),
   );
   const lowest = lowestAscending[lowestAscending.length - 1];
   const bottom = lowest.top + lowest.height;
-  console.log(left, right, rightest);
   const width = (Math.abs(left) + right) / scaleDown;
   const height = (Math.abs(top) + Math.abs(bottom)) / scaleDown;
 

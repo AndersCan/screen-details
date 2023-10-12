@@ -1,26 +1,39 @@
 {
-  "name": "screen-tools",
-  "private": true,
+  "name": "screen-details",
   "version": "0.0.0",
   "type": "module",
+  "main": "./package/index.package.cjs",
+  "module": "./package/index.package.js",
+  "types": "./package/index.package.d.ts",
+  "exports": {
+    ".": {
+      "import": "./package/index.package.js",
+      "require": "./package/index.package.cjs"
+    }
+  },
+  "files": [
+    "package/"
+  ],
+  "sideEffects": false,
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "lit": "^3.0.0",
-    "lit-html": "^3.0.0",
-    "usignal": "^0.9.0"
+    "build:dev": "tsc && vite build",
+    "preview:dev": "vite preview",
+    "test": "vitest run & tsc",
+    "build": "vite build --config vite.config.package.ts",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "devDependencies": {
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "autoprefixer": "^10.4.16",
+    "lit-html": "^3.0.0",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.0.2",
+    "usignal": "^0.9.0",
     "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.6.0",
     "vitest": "^0.34.6"
   },
   "prettier": {
