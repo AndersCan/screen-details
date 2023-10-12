@@ -20,13 +20,9 @@ export function getScreenSizes(
 ) {
   const screens = [...readonlyScreens];
   // find lowest left
-  const lowestLeft = Math.abs(
-    screens.sort((a, b) => a.left - b.left)[0]?.left ?? 0,
-  );
+  const lowestLeft = Math.abs(screens.sort((a, b) => a.left - b.left)[0].left);
   // find lowest top
-  const lowestTop = Math.abs(
-    screens.sort((a, b) => a.top - b.top)[0]?.top ?? 0,
-  );
+  const lowestTop = Math.abs(screens.sort((a, b) => a.top - b.top)[0].top);
   const { scaleDown } = options;
 
   return screens.map((screen) => {

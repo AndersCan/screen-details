@@ -2,12 +2,23 @@ type StringDirs = WindowFeatureBools | WindowFeatureNums;
 
 type WindowFeatureBools = "popup" | "noopener" | "noreferrer";
 
+type TextBool = "yes" | "no";
+
 type WindowFeatureNums =
   | `width=${number}`
   | `height=${number}`
   | `left=${number}`
-  | `top=${number}`;
+  | `top=${number}`
+  | `toolbar=${TextBool}`
+  | `location=${TextBool}`
+  // What is this?
+  | `directories=${TextBool}`
+  | `status=${TextBool}`
+  | `menubar=${TextBool}`
+  | `scrollbar=${TextBool}`
+  | `resizable=${TextBool}`;
 
+// "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400
 type Recursive<
   LegalType extends string,
   Type extends string,
