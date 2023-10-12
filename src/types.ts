@@ -21,7 +21,6 @@ export interface ScreenDetailed {
   /** Set by OS as primary */
   isPrimary: boolean;
   label: string;
-  /** Minimum value is 0 */
   left: number;
   orientation: Orientation;
   pixelDepth: number;

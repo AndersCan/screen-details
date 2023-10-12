@@ -2,7 +2,7 @@ import { ScreenDetailed } from "../types";
 
 type NeededScreenProps = Pick<
   ScreenDetailed,
-  "height" | "left" | "width" | "top" | "label"
+  "height" | "left" | "width" | "top"
 >;
 type Options = {
   scaleDown: number;
@@ -15,6 +15,7 @@ type Options = {
  * Transposes all items such that no items have a negative position left or top value
  */
 export function getScreenSizes(
+  // TODO: Should be typeof `ScreenDetailed.screen[0]`. Typed like this for easy testing :/
   readonlyScreens: readonly NeededScreenProps[],
   options: Options = { scaleDown: 1 },
 ) {
@@ -32,6 +33,6 @@ export function getScreenSizes(
     const width = screen.width / scaleDown;
     const height = screen.height / scaleDown;
 
-    return { screen, left, top, width, height, label: screen.label };
+    return { screen, left, top, width, height };
   });
 }

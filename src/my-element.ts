@@ -56,9 +56,10 @@ export class MyElement extends HTMLElement {
   template() {
     try {
       const screens = getScreenSizes(this.state.screens);
-      const screenshtml = screens.map((screen) => {
+      const screenshtml = screens.map((sizes) => {
+        const screen = sizes.screen as ScreenDetailed;
         const bg =
-          screen.label === this.state.currentScreen.label
+          screen === this.state.currentScreen
             ? {
                 default: "bg-orange-700",
                 hover: "hover:bg-orange-600",
@@ -69,11 +70,11 @@ export class MyElement extends HTMLElement {
               };
 
         const scaleDown = 10;
-        const left = screen.left / scaleDown;
-        const top = screen.top / scaleDown;
+        const left = sizes.left / scaleDown;
+        const top = sizes.top / scaleDown;
 
-        const width = screen.width / scaleDown;
-        const height = screen.height / scaleDown;
+        const width = sizes.width / scaleDown;
+        const height = sizes.height / scaleDown;
         const style = `left: ${left}px; top: ${top}px; width: ${width}px; height:${height}px;`;
         return html`
           <button
@@ -82,7 +83,7 @@ export class MyElement extends HTMLElement {
             data-label="${screen.label}"
             @click="${() => {
               const screenselected = new CustomEvent("screenselected", {
-                detail: { screen },
+                detail: { screen: sizes },
               });
               this.dispatchEvent(screenselected);
             }}"
