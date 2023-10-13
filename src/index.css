@@ -5,3 +5,24 @@
 my-element {
   display:block;
 }
+
+.chess-pattern::before { 
+  content: ""; 
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  background: repeating-linear-gradient( 
+      0deg, #000 0, #000 20px,  
+      #fff 20px, #fff 40px); 
+} 
+
+.chess-pattern::after { 
+  content: ""; 
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  background: repeating-linear-gradient( 
+      -90deg, #000 0, #000 20px,  
+      #fff 20px, #fff 40px); 
+  mix-blend-mode: difference; 
+} 

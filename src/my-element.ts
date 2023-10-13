@@ -78,7 +78,7 @@ export class MyElement extends HTMLElement {
         const style = `left: ${left}px; top: ${top}px; width: ${width}px; height:${height}px;`;
         return html`
           <button
-            class="absolute text-white ${bg.default} ${bg.hover} rounded-sm"
+            class="absolute text-white ${bg.default} ${bg.hover} rounded-sm z-10"
             style="${style}"
             data-label="${screen.label}"
             @click="${() => {
@@ -103,7 +103,7 @@ export class MyElement extends HTMLElement {
         <pre>${this.state.text.value}</pre>
 
         <div
-          class="relative bg-slate-300 mx-auto"
+          class="chess-pattern relative mx-auto"
           style="width: ${this.state.containerSize.value
             .width}px; height: ${this.state.containerSize.value.height}px;"
         >
