@@ -10,13 +10,15 @@ type WindowFeatureNums =
   | `left=${number}`
   | `top=${number}`
   | `toolbar=${TextBool}`
+  | `titlebar=${TextBool}`
   | `location=${TextBool}`
   // What is this?
   | `directories=${TextBool}`
   | `status=${TextBool}`
   | `menubar=${TextBool}`
   | `scrollbar=${TextBool}`
-  | `resizable=${TextBool}`;
+  | `resizable=${TextBool}`
+  | `copyhistory=${TextBool}`;
 
 // "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400
 type Recursive<

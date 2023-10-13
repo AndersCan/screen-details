@@ -15,6 +15,9 @@ export function getContainerSize(
   readonlyScreens: NeededScreenProps[],
   options: Options = { scaleDown: 1 },
 ) {
+  if (readonlyScreens.length === 0) {
+    return { height: 0, width: 0 };
+  }
   const { scaleDown } = options;
   const screens = [...readonlyScreens];
   const leftAscending = screens.sort((a, b) => a.left - b.left);

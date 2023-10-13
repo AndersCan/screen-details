@@ -3,6 +3,16 @@ import { describe, test, expect } from "vitest";
 import { getContainerSize } from "./get-container-size";
 
 describe("getContainerSize", () => {
+  test("empty array", () => {
+    const expected = {
+      width: 0,
+      height: 0,
+    };
+
+    const actual = getContainerSize([]);
+    expect(actual).toStrictEqual(expected);
+  });
+
   test("simple test", () => {
     const expected = {
       width: 222,

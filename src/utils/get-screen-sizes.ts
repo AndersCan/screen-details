@@ -19,6 +19,9 @@ export function getScreenSizes(
   readonlyScreens: readonly NeededScreenProps[],
   options: Options = { scaleDown: 1 },
 ) {
+  if (readonlyScreens.length === 0) {
+    return [];
+  }
   const screens = [...readonlyScreens];
   // find lowest left
   const lowestLeft = Math.abs(screens.sort((a, b) => a.left - b.left)[0].left);
